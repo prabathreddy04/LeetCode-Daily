@@ -17,3 +17,36 @@ Input
 [[], [10, 20], [15, 25], [20, 30]]
 Output
 [null, true, false, true]
+
+CODE :
+class MyCalendar {
+public:
+    vector<pair<int, int>> vec;
+    MyCalendar() {
+        vec.push_back({-1, -1});
+    }
+    
+    bool book(int start, int end) {
+        if(vec.size()==1) {
+            vec.push_back({start, end});
+            return true;
+    }    
+        int count=1;
+        for(int i=1; i<vec.size(); i++){
+            if(vec[i].first >= end || vec[i].second <= start ) {
+                count++;
+            } 
+        }
+        if(count== vec.size() ){
+            vec.push_back({start, end});
+            return true;
+        }
+        return false;
+}
+};
+
+/**
+ * Your MyCalendar object will be instantiated and called as such:
+ * MyCalendar* obj = new MyCalendar();
+ * bool param_1 = obj->book(start,end);
+ */
