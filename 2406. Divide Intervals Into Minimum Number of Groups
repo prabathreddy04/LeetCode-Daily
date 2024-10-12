@@ -1,0 +1,73 @@
+The problem requires us to group intervals such that no two intervals in the same group overlap. We need to return the minimum number of such groups.
+
+Initial Approach:
+In my first attempt, I used a vector of queues to manage the groups. The idea was to:
+
+Sort the intervals by their starting points.
+Iterate over each interval, checking all existing groups to see if the current interval can be placed in one of them (i.e., if the current interval’s start time is greater than the end time of the group's last interval).
+If no such group was found, create a new group.
+
+My initial Code : 
+class Solution {
+public:
+    int minGroups(vector<vector<int>>& intervals) {
+        int n = intervals.size();
+        vector<queue<pair<int, int>>> vec;
+        sort(intervals.begin(), intervals.end());
+        queue<pair<int, int>> q;
+        q.push({intervals[0][0], intervals[0][1]});
+        vec.push_back(q);
+        q.pop();
+        
+        for (int i = 1; i < n; i++) {
+            int k = vec.size();
+            int flag = 0;
+            for (int j = 0; j < k; j++) {
+                if (vec[j].front().second < intervals[i][0]) {
+                    vec[j].pop();
+                    vec[j].push({intervals[i][0], intervals[i][1]});
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag == 0) {
+                q.push({intervals[i][0], intervals[i][1]});
+                vec.push_back(q);
+                q.pop();
+            }
+        }
+        return vec.size();
+    }
+};
+
+
+Why this approach didn't work:
+While this approach passed 30 out of 35 test cases, it resulted in a Time Limit Exceeded (TLE) error on the 31st test case. The issue lies in the O(n^2) time complexity due to the nested loops. For each interval, I checked all existing groups, which slowed the algorithm significantly for larger inputs where many intervals overlap.
+
+Optimized Approach:
+To improve efficiency, I switched to using a priority queue (min-heap). The key idea was:
+
+Instead of manually maintaining groups, I used a priority queue to keep track of the end times of the intervals in different groups.
+After sorting the intervals by their start times, for each new interval, I compared its start time with the earliest end time (the top of the heap).
+If the start time is greater than or equal to the smallest end time, the current interval can merge into that group (i.e., I pop the heap and push the new end time).
+If not, I add the interval to a new group by pushing its end time into the heap.
+This change significantly reduced the time complexity to O(n log n), which efficiently handles larger inputs.
+
+The optmized code : 
+class Solution {
+public:
+    int minGroups(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end());
+        priority_queue<int, vector<int>, greater<int>> pq;
+
+        for (auto interval : intervals) {
+            int start = interval[0], end = interval[1];
+            if (!pq.empty() && pq.top() < start) {
+                pq.pop();
+            }
+            pq.push(end);
+        }
+
+        return pq.size();
+    }
+};
