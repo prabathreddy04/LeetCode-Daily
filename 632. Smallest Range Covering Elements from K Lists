@@ -1,0 +1,59 @@
+class Solution {
+public:
+    vector<int> smallestRange(vector<vector<int>>& nums) {
+        // Min heap to store {value, list_index} pairs
+        priority_queue <pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> minheap;
+        int k = nums.size();
+        vector<pair<int, int>> vec;
+
+        // Step 1: Insert all elements from all lists into the min heap
+        for (int i = 0; i < k; i++) {
+            int s = nums[i].size();
+            for (int j = 0; j < s; j++) {
+                minheap.push({nums[i][j], i});  // Insert {value, list_index}
+            }
+        }
+
+        // Step 2: Pop elements from the min heap and store them in the vec
+        while (!minheap.empty()) {
+            auto a = minheap.top();
+            vec.push_back(a);  // Store the {value, list_index}
+            minheap.pop();
+        }
+
+        // Step 3: Initialize variables to track the result range
+        int start = -1, end = -1, min_range = INT_MAX;
+        unordered_map<int, int> countMap;  // To count how many elements from each list are in the window
+        int left = 0, unique_lists_in_window = 0;
+
+        // Step 4: Sliding window to find the smallest range
+        for (int right = 0; right < vec.size(); right++) {
+            // Add the current element's list index to the countMap
+            countMap[vec[right].second]++;
+            if (countMap[vec[right].second] == 1) {
+                unique_lists_in_window++;  // We got a new list in the window
+            }
+
+            // Step 5: If the window contains elements from all lists, try to shrink it
+            while (unique_lists_in_window == k) {
+                // Calculate the current range
+                int current_range = vec[right].first - vec[left].first;
+                if (current_range < min_range) {
+                    min_range = current_range;
+                    start = vec[left].first;
+                    end = vec[right].first;
+                }
+
+                // Shrink the window from the left
+                countMap[vec[left].second]--;
+                if (countMap[vec[left].second] == 0) {
+                    unique_lists_in_window--;  // One list is no longer in the window
+                }
+                left++;
+            }
+        }
+
+        // Return the result range
+        return {start, end};
+    }
+};
