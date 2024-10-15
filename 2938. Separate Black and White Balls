@@ -1,0 +1,64 @@
+Approach 1: TWO POINTER
+Intuition:
+The task is to count the minimum steps required to rearrange the string so that all '1's are moved to the right and all '0's to the left.In a  two-pointer approach,  we check positions from both ends of the string and make the necessary swaps.
+
+By iterating through the string with two pointers, we look for misplaced '0's on the right side and misplaced '1's on the left side. Whenever such a mismatch is found, we swap the characters and count the number of steps required (which is the distance between the two indices). This way, we minimize the number of swaps and calculate the exact number of steps to get all '1's on the left and '0's on the right.
+
+TWO POINTER APPROACH || CPP ||
+
+class Solution {
+public:
+    long long minimumSteps(string s) {
+        long long ans = 0;
+        int flag = 1;
+        int l= 0; 
+        int r = s.length()-1;
+        while(l<r){
+            while(s[l]!='1' &&  l<r) l++;
+            while(s[r]!='0' && r>l) r--;
+            if(s[l]=='0' && s[r]=='1')  continue;
+            swap(s[l], s[r]);
+            ans+= r-l;
+            l++;
+            r--;
+        }
+        return ans;
+    }
+};
+
+Approach 2: Keeping track of the number of misplaced zeros
+
+Intuition:
+In this approach, we count the number of steps required to arrange all '1's to the left and all '0's to the right without performing any actual swaps. The idea is to accumulate the number of '1's encountered so far and, for every '0', calculate how many '1's are on its left that would need to be moved.
+
+The key observation is that every time we encounter a '0', we count how many '1's are before it and add that to the total number of steps. This way, we avoid the need to swap the characters directly and simply calculate the required number of moves efficiently.
+
+Approach: Track Number of '1's:
+
+We traverse the string and keep a counter (prev) for the number of '1's encountered so far.
+Count Steps for Every '0':
+When we encounter a '0', the number of '1's that need to be swapped is exactly the number of '1's (prev) that have been seen before this '0'. We add this count to our total count.
+Efficient Calculation:
+This approach runs in a single pass through the string (O(n) time complexity), and by keeping a running count of '1's, we can calculate the number of steps in an efficient manner.
+
+TWO POINTER APPROACH || CPP
+class Solution {
+public:
+    long long minimumSteps(string s) {
+        long long count = 0;    // Variable to store the number of steps
+        long long prev = 0;     // Variable to track number of '1's encountered
+        int n = s.length();     // Length of the string
+
+        for (int i = 0; i < n; i++) {
+            if (s[i] == '1') {
+                // Increment 'prev' whenever we encounter a '1'
+                prev++;
+            }
+            if (s[i] == '0') {
+                // For every '0', add the number of '1's before it to the count
+                count += prev;
+            }
+        }
+        return count;    // Return the total number of steps
+    }
+};
