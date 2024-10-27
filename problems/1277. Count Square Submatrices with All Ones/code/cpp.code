@@ -1,0 +1,30 @@
+class Solution {
+public:
+    int countSquares(vector<vector<int>>& matrix) {
+        int m = matrix.size();
+        int n = matrix[0].size();
+        int count = 0;
+
+        // Iterate through each cell of the matrix
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                // Try to form squares starting from (i, j)
+                for (int size = 1; size + i <= m && size + j <= n; size++) {
+                    bool isSquare = true;
+                    for (int x = i; x < i + size; x++) {
+                        for (int y = j; y < j + size; y++) {
+                            if (matrix[x][y] == 0) {
+                                isSquare = false;
+                                break;
+                            }
+                        }
+                        if (!isSquare) break;
+                    }
+                    if (isSquare) count++;  // Only increment count if it is a valid square
+                    else break;  // Break out of the loop if the current square is invalid
+                }
+            }
+        }
+        return count;
+    }
+};
